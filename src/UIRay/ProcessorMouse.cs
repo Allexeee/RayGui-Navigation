@@ -16,50 +16,54 @@ namespace UI.Ray
       _storageSelected = storageSelected;
     }
 
-    public void Update()
+    // public void Update()
+    // {
+    //   Vector2 mousePoint = Raylib.GetMousePosition();
+
+    //   foreach (UI.Ray.Button element in _processorUI.Buttons)
+    //   {
+    //     // Check button state
+
+    //     if (element != _storageSelected.Selected)
+    //       element.Reset();
+    //     if (Raylib.CheckCollisionPointRec(mousePoint, element.Rectangle))
+    //     {
+    //       if (Raylib.IsMouseButtonDown(Raylib.MOUSE_LEFT_BUTTON))
+    //         element.SetDowned();
+    //       else
+    //       {
+    //         _storageSelected.Selected = element;
+    //         element.SetFocused();
+    //       }
+    //       if (Raylib.IsMouseButtonReleased(Raylib.MOUSE_LEFT_BUTTON))
+    //       {
+    //         element.SetReleased();
+    //         // element.Reset();
+    //       }
+    //     }
+    //   }
+    // }
+
+    public static InfoElement Check(UI.Ray.Button element)
     {
       Vector2 mousePoint = Raylib.GetMousePosition();
 
-      foreach (UI.Ray.Button element in _processorUI.Buttons)
+      InfoElement result = new InfoElement
       {
-        // Check button state
-
-        if (element != _storageSelected.Selected)
-          element.Reset();
-        if (Raylib.CheckCollisionPointRec(mousePoint, element.Rectangle))
-        {
-          if (Raylib.IsMouseButtonDown(Raylib.MOUSE_LEFT_BUTTON))
-            element.SetDowned();
-          else
-          {
-            _storageSelected.Selected = element;
-            element.SetFocused();
-          }
-          if (Raylib.IsMouseButtonReleased(Raylib.MOUSE_LEFT_BUTTON))
-          {
-            element.SetReleased();
-            // element.Reset();
-          }
-        }
-      }
-    }
-
-    public static UI.GuiControlState Check(UI.Ray.Button element)
-    {
-      Vector2 mousePoint = Raylib.GetMousePosition();
-
-      UI.GuiControlState result = UI.GuiControlState.GUI_STATE_NORMAL;
+        State = GuiControlState.GUI_STATE_NORMAL,
+        IsPressed = false,
+      };
 
       if (Raylib.CheckCollisionPointRec(mousePoint, element.Rectangle))
       {
         if (Raylib.IsMouseButtonDown(Raylib.MOUSE_LEFT_BUTTON))
-          result = GuiControlState.GUI_STATE_PRESSED;
+          result.State = GuiControlState.GUI_STATE_PRESSED;
         else
-          result = GuiControlState.GUI_STATE_FOCUSED;
+          result.State = GuiControlState.GUI_STATE_FOCUSED;
 
         if (Raylib.IsMouseButtonReleased(Raylib.MOUSE_LEFT_BUTTON))
         {
-          result = GuiControlState.GUI_STATE_RELEASED;
+          result.IsPressed = true;
         }
       }
 

@@ -22,7 +22,7 @@ namespace UI
     {
       foreach (var element in Buttons)
       {
-        element.Draw();
+        element.UpdateAndDraw();
       }
     }
   }

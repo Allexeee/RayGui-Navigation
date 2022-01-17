@@ -8,7 +8,8 @@ namespace UI.Ray
   {
     public Rectangle Rectangle { get; set; }
 
-    GuiControlState state;
+    InfoElement _info;
+    GuiControlState state => _info.State;
 
     public event Action? OnClick;
 
@@ -17,26 +18,29 @@ namespace UI.Ray
       Rectangle = rectangle;
     }
 
-    public override void Draw()
+    public override void UpdateAndDraw()
     {
-      state = GetState();
+      // state = GetState();
+      _info = UpdateState();
+      if (_info.IsPressed)
+        OnClick?.Invoke();
       Raylib.DrawRectangleRec(Rectangle, Fade(GetColor((uint)GuiGetStyle((int)GuiControl.BUTTON, (int)GuiControlProperty.BASE_COLOR_NORMAL + ((int)state * 3))), 1f));
       Raylib.DrawRectangleLinesEx(Rectangle, GuiGetStyle((int)GuiControl.BUTTON, (int)GuiControlProperty.BORDER_WIDTH), Fade(GetColor((uint)GuiGetStyle((int)GuiControl.BUTTON, (int)GuiControlProperty.BORDER_COLOR_NORMAL + ((int)state * 3))), 1f));
     }
 
-    public override void SetFocused()
-    {
-      state = GuiControlState.GUI_STATE_FOCUSED;
-    }
+    // public override void SetFocused()
+    // {
+    //   state = GuiControlState.GUI_STATE_FOCUSED;
+    // }
 
-    public override void Reset()
-    {
-      state = GuiControlState.GUI_STATE_NORMAL;
-    }
-    public override void SetDowned()
-    {
-      state = GuiControlState.GUI_STATE_PRESSED;
-    }
+    // public override void Reset()
+    // {
+    //   state = GuiControlState.GUI_STATE_NORMAL;
+    // }
+    // public override void SetDowned()
+    // {
+    //   state = GuiControlState.GUI_STATE_PRESSED;
+    // }
 
     public override string? ToString()
     {
@@ -48,27 +52,26 @@ namespace UI.Ray
       OnClick?.Invoke();
     }
 
-    UI.GuiControlState GetState()
+    InfoElement UpdateState()
     {
       var stateMouse = ProcessorMouse.Check(this);
       var stateNav = ProcessorNavigation.Check(this);
 
-      UI.GuiControlState result = UI.GuiControlState.GUI_STATE_NORMAL;
-
-      if (stateNav == UI.GuiControlState.GUI_STATE_RELEASED || stateMouse == UI.GuiControlState.GUI_STATE_RELEASED)
+      InfoElement result = new InfoElement
       {
-        result = UI.GuiControlState.GUI_STATE_PRESSED;
-      }
-      else
-      if (stateNav == UI.GuiControlState.GUI_STATE_PRESSED || stateMouse == UI.GuiControlState.GUI_STATE_PRESSED)
+        State = GuiControlState.GUI_STATE_NORMAL,
+        IsPressed = stateMouse.IsPressed || stateNav.IsPressed,
+      };
+
+      if (stateNav.State == GuiControlState.GUI_STATE_PRESSED || stateMouse.State == GuiControlState.GUI_STATE_PRESSED)
       {
         ProcessorNavigation.Selected = this;
 
-        result = UI.GuiControlState.GUI_STATE_PRESSED;
+        result.State = GuiControlState.GUI_STATE_PRESSED;
       }
       else
-      if (stateNav == UI.GuiControlState.GUI_STATE_FOCUSED || stateMouse == UI.GuiControlState.GUI_STATE_FOCUSED)
-        result = UI.GuiControlState.GUI_STATE_FOCUSED;
+      if (stateNav.State == GuiControlState.GUI_STATE_FOCUSED || stateMouse.State == GuiControlState.GUI_STATE_FOCUSED)
+        result.State = GuiControlState.GUI_STATE_FOCUSED;
 
       return result;
     }

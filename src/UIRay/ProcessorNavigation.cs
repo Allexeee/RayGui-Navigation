@@ -13,7 +13,7 @@ namespace UI.Ray
     {
       if (IsKeyReleased(KeyboardKey.KEY_S))
       {
-        Selected.Reset();
+        // Selected.Reset();
         SetSelected(GetNextDown());
       }
 
@@ -30,22 +30,27 @@ namespace UI.Ray
       // }
     }
 
-    public static UI.GuiControlState Check(UI.Ray.Button element)
+    public static InfoElement Check(UI.Ray.Button element)
     {
-      UI.GuiControlState result = UI.GuiControlState.GUI_STATE_NORMAL;
+      InfoElement result = new InfoElement
+      {
+        State = GuiControlState.GUI_STATE_NORMAL,
+        IsPressed = false,
+
+      };
 
       if (Selected == element)
       {
-        result = UI.GuiControlState.GUI_STATE_FOCUSED;
+        result.State = GuiControlState.GUI_STATE_FOCUSED;
 
         if (IsKeyDown(KeyboardKey.KEY_SPACE))
         {
-          result = UI.GuiControlState.GUI_STATE_PRESSED;
+          result.State = GuiControlState.GUI_STATE_PRESSED;
         }
 
         if (IsKeyReleased(KeyboardKey.KEY_SPACE))
         {
-          result = UI.GuiControlState.GUI_STATE_RELEASED;
+          result.IsPressed = true;
         }
       }
 

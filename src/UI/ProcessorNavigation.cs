@@ -21,7 +21,7 @@ namespace UI
     public void SetSelected(UI.Button self)
     {
       Selected = self;
-      Selected.SetFocused();
+      // Selected.SetFocused();
     }
 
     public UI.Button GetNextDown()
