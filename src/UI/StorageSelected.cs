@@ -2,6 +2,6 @@ namespace UI
 {
   public class StorageSelected
   {
-    public UI.Button Selected { get; set; }
+    public UI.IElement Selected { get; set; }
   }
 }

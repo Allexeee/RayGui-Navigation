@@ -4,66 +4,34 @@ using UI;
 
 namespace UI.Ray
 {
-
   public class ProcessorMouse
   {
     StorageSelected _storageSelected;
-    ProcessorUI _processorUI;
+    InputType _inputType;
 
-    public ProcessorMouse(ProcessorUI processorUI, StorageSelected storageSelected)
+    public ProcessorMouse(InputType inputType, StorageSelected storageSelected)
     {
-      _processorUI = processorUI;
+      _inputType = inputType;
       _storageSelected = storageSelected;
     }
 
-    // public void Update()
-    // {
-    //   Vector2 mousePoint = Raylib.GetMousePosition();
-
-    //   foreach (UI.Ray.Button element in _processorUI.Buttons)
-    //   {
-    //     // Check button state
-
-    //     if (element != _storageSelected.Selected)
-    //       element.Reset();
-    //     if (Raylib.CheckCollisionPointRec(mousePoint, element.Rectangle))
-    //     {
-    //       if (Raylib.IsMouseButtonDown(Raylib.MOUSE_LEFT_BUTTON))
-    //         element.SetDowned();
-    //       else
-    //       {
-    //         _storageSelected.Selected = element;
-    //         element.SetFocused();
-    //       }
-    //       if (Raylib.IsMouseButtonReleased(Raylib.MOUSE_LEFT_BUTTON))
-    //       {
-    //         element.SetReleased();
-    //         // element.Reset();
-    //       }
-    //     }
-    //   }
-    // }
-
-    public static InfoElement Check(UI.Ray.Button element)
+    public UI.ElementInputState Check(UI.Ray.Button element, out InputType input)
     {
       Vector2 mousePoint = Raylib.GetMousePosition();
 
-      InfoElement result = new InfoElement
-      {
-        State = GuiControlState.GUI_STATE_NORMAL,
-        IsPressed = false,
-      };
+      UI.ElementInputState result = UI.ElementInputState.Normal;
+      input = _inputType;
 
       if (Raylib.CheckCollisionPointRec(mousePoint, element.Rectangle))
       {
         if (Raylib.IsMouseButtonDown(Raylib.MOUSE_LEFT_BUTTON))
-          result.State = GuiControlState.GUI_STATE_PRESSED;
+          result = UI.ElementInputState.Pressed;
         else
-          result.State = GuiControlState.GUI_STATE_FOCUSED;
+          result = UI.ElementInputState.Focused;
 
         if (Raylib.IsMouseButtonReleased(Raylib.MOUSE_LEFT_BUTTON))
         {
-          result.IsPressed = true;
+          result = UI.ElementInputState.Released;
         }
       }
 

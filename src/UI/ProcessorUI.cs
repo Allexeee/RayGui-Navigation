@@ -2,27 +2,34 @@ namespace UI
 {
   public class ProcessorUI
   {
-    List<Button> _buttons;
+    List<IElement> _elements;
 
-    public IEnumerable<Button> Buttons => _buttons;
+    public IEnumerable<IElement> Elements => _elements;
+
+
+    Dictionary<IElement, InputType?> _inputs = new Dictionary<IElement, InputType?>();
+
+    public Dictionary<IElement, InputType?> Inputs => _inputs;
 
     public ProcessorUI()
     {
-      _buttons = new List<Button>();
+      _elements = new List<IElement>();
     }
 
-    public void Add(Button button)
+    public void Add(IElement element)
     {
-      if (_buttons.Contains(button))
+      if (_elements.Contains(element))
         throw new InvalidOperationException($"Элемент уже добавлен в список!");
-      _buttons.Add(button);
+      _elements.Add(element);
+      _inputs.Add(element, null);
     }
 
     public void Draw()
     {
-      foreach (var element in Buttons)
+      foreach (var element in Elements)
       {
-        element.UpdateAndDraw();
+        element.UpdateState();
+        element.Draw();
       }
     }
   }

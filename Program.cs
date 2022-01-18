@@ -5,30 +5,40 @@ using static Raylib_CsLo.RayGui;
 using static Raylib_CsLo.Raylib;
 public static class Program
 {
+  static ProcessorMouse processorMouse;
+  static ProcessorNavigation processorNavigation;
+  static UI.ProcessorUI processorUI;
+
   public static unsafe void Main(params string[] args)
   {
-    Raylib.InitWindow(980, 420, "RayGUI");
+    Raylib.InitWindow(420, 420, "RayGUI");
     var q = new Vector2(5, 20);
     var req1 = new Rectangle(50, 50, 400, 400);
     var req2 = new Rectangle(50, 50, 100, 100);
     Vector2* r = &q;
 
     UI.StorageSelected storageSelected = new UI.StorageSelected();
-    UI.ProcessorUI processorUI = new UI.ProcessorUI();
-    ProcessorMouse processorMouse = new ProcessorMouse(processorUI, storageSelected);
-    ProcessorNavigation processorNavigation = new ProcessorNavigation(storageSelected);
+    processorUI = new UI.ProcessorUI();
+    var inputTypeMouse = new InputTypeMouse();
+    var inputTypeNavigation = new InputTypeNavigation();
+    processorMouse = new ProcessorMouse(inputTypeMouse, storageSelected);
+    processorNavigation = new ProcessorNavigation(inputTypeNavigation, storageSelected);
     Button button1 = new Button(new Rectangle(50, 50, 200, 50));
     Button button2 = new Button(new Rectangle(50, 100, 200, 50));
+    Button button3 = new Button(new Rectangle(50, 150, 200, 50));
     processorUI.Add(button1);
     processorUI.Add(button2);
+    processorUI.Add(button3);
 
     processorNavigation.RegisterDown(button1, button2);
-    processorNavigation.RegisterDown(button2, button1);
+    processorNavigation.RegisterDown(button2, button3);
+    processorNavigation.RegisterDown(button3, button1);
 
     processorNavigation.SetSelected(button1);
 
-    button1.OnClick += () => OnClick($"Button 1 click!");
-    button2.OnClick += () => OnClick($"Button 2 click!");
+    button1.Submited += () => OnClick($"Button 1 click!");
+    button2.Submited += () => OnClick($"Button 2 click!");
+    button3.Submited += () => OnClick($"Button 3 click!");
 
     while (!Raylib.WindowShouldClose())
     {
@@ -226,5 +236,66 @@ public static class Program
 
     return (int)size.X;
   }
-}
 
+  public static UI.ElementInputState GetInputState(UI.Ray.Button button)
+  {
+    var stateMouse = processorMouse.Check(button, out var inputTypeMouse);
+    var stateNav = processorNavigation.Check(button, out var inputTypeNavigation);
+    var inputTypeButton = processorUI.Inputs[button];
+
+    UI.ElementInputState result = UI.ElementInputState.Normal;
+
+    if ((inputTypeButton == null || inputTypeButton == inputTypeNavigation) && stateNav == UI.ElementInputState.Pressed)
+    {
+      result = UI.ElementInputState.Pressed;
+      processorUI.Inputs[button] = inputTypeNavigation;
+      // button.InputType = InputType.Navigation;
+    }
+    else if (inputTypeButton == inputTypeNavigation && stateNav == UI.ElementInputState.Released)
+    {
+      result = UI.ElementInputState.Released;
+    }
+    else if (stateMouse == UI.ElementInputState.Pressed)
+    {
+      result = UI.ElementInputState.Pressed;
+      processorUI.Inputs[button] = inputTypeMouse;
+      // button.InputType = InputType.Mouse;
+    }
+    else if (inputTypeButton == inputTypeMouse && stateMouse == UI.ElementInputState.Released)
+    {
+      result = UI.ElementInputState.Released;
+    }
+    else if (stateNav == UI.ElementInputState.Focused || stateMouse == UI.ElementInputState.Focused)
+    {
+      result = UI.ElementInputState.Focused;
+      processorUI.Inputs[button] = null;
+      // button.InputType = InputType.None;
+    }
+
+    // if ((button.InputType == InputType.None || button.InputType == InputType.Navigation) && stateNav == UI.ElementInputState.Pressed)
+    // {
+    //   result = UI.ElementInputState.Pressed;
+    //   button.InputType = InputType.Navigation;
+    // }
+    // else if (button.InputType == InputType.Navigation && stateNav == UI.ElementInputState.Released)
+    // {
+    //   result = UI.ElementInputState.Released;
+    // }
+    // else if (stateMouse == UI.ElementInputState.Pressed)
+    // {
+    //   result = UI.ElementInputState.Pressed;
+    //   button.InputType = InputType.Mouse;
+    // }
+    // else if (button.InputType == InputType.Mouse && stateMouse == UI.ElementInputState.Released)
+    // {
+    //   result = UI.ElementInputState.Released;
+    // }
+    // else if (stateNav == UI.ElementInputState.Focused || stateMouse == UI.ElementInputState.Focused)
+    // {
+    //   result = UI.ElementInputState.Focused;
+    //   button.InputType = InputType.None;
+    // }
+
+    return result;
+  }
+}
