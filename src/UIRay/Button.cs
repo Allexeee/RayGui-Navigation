@@ -23,9 +23,6 @@ namespace UI.Ray
     {
       var stateInputNext = Program.GetInputState(this);
 
-      if (stateInputNext == ElementInputState.Pressed)
-        ProcessorNavigation.Selected = this;
-
       if (stateInputNext == ElementInputState.Released)
         OnSubmit();
       _stateShow = GetControlState(stateInputNext, false);

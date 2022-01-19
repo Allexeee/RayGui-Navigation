@@ -4,7 +4,7 @@ namespace UI
   {
     static StorageSelected _storageSelected;
 
-    public static UI.IElement Selected { get => _storageSelected.Selected; set => _storageSelected.Selected = value; }
+    public UI.IElement Selected { get => _storageSelected.Selected; set => _storageSelected.Selected = value; }
 
     Dictionary<UI.IElement, UI.IElement> _dictionaryDown = new Dictionary<UI.IElement, UI.IElement>();
 

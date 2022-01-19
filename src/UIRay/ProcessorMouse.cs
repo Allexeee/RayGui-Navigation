@@ -4,7 +4,7 @@ using UI;
 
 namespace UI.Ray
 {
-  public class ProcessorMouse
+  public class ProcessorMouse : ProcessorInput<UI.Ray.Button>
   {
     StorageSelected _storageSelected;
     InputType _inputType;
@@ -15,7 +15,7 @@ namespace UI.Ray
       _storageSelected = storageSelected;
     }
 
-    public UI.ElementInputState Check(UI.Ray.Button element, out InputType input)
+    public override UI.ElementInputState Check(UI.Ray.Button element, out InputType input)
     {
       Vector2 mousePoint = Raylib.GetMousePosition();
 

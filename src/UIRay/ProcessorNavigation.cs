@@ -3,30 +3,33 @@ using static Raylib_CsLo.Raylib;
 
 namespace UI.Ray
 {
-  public class ProcessorNavigation : UI.ProcessorNavigation
+  public class ProcessorNavigation : ProcessorInput<UI.IElement>
   {
     InputType _inputType;
 
-    public ProcessorNavigation(InputType inputType, StorageSelected storageSelected) : base(storageSelected)
+    UI.ProcessorNavigation _processorNavigation;
+
+    public ProcessorNavigation(InputType inputType, UI.ProcessorNavigation processorNavigation)
     {
       _inputType = inputType;
+      _processorNavigation = processorNavigation;
     }
 
     public void Update()
     {
       if (IsKeyReleased(KeyboardKey.KEY_S))
       {
-        SetSelected(GetNextDown());
+        _processorNavigation.Selected = _processorNavigation.GetNextDown();
       }
     }
 
-    public UI.ElementInputState Check(UI.Ray.Button element, out InputType inputType)
+    public override UI.ElementInputState Check(UI.IElement element, out InputType inputType)
     {
       UI.ElementInputState result = UI.ElementInputState.Normal;
 
       inputType = _inputType;
 
-      if (Selected == element)
+      if (_processorNavigation.Selected == element)
       {
         result = UI.ElementInputState.Focused;
 

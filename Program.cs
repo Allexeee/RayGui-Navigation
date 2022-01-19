@@ -6,8 +6,11 @@ using static Raylib_CsLo.Raylib;
 public static class Program
 {
   static ProcessorMouse processorMouse;
-  static ProcessorNavigation processorNavigation;
+  static UI.ProcessorNavigation processorNavigationUI;
+  static UI.Ray.ProcessorNavigation processorNavigationRay;
   static UI.ProcessorUI processorUI;
+
+  static List<ProcessorInput<UI.IElement>> processorInputs = new List<ProcessorInput<UI.IElement>>();
 
   public static unsafe void Main(params string[] args)
   {
@@ -22,7 +25,8 @@ public static class Program
     var inputTypeMouse = new InputTypeMouse();
     var inputTypeNavigation = new InputTypeNavigation();
     processorMouse = new ProcessorMouse(inputTypeMouse, storageSelected);
-    processorNavigation = new ProcessorNavigation(inputTypeNavigation, storageSelected);
+    processorNavigationUI = new UI.ProcessorNavigation(storageSelected);
+    processorNavigationRay = new UI.Ray.ProcessorNavigation(inputTypeNavigation, processorNavigationUI);
     Button button1 = new Button(new Rectangle(50, 50, 200, 50));
     Button button2 = new Button(new Rectangle(50, 100, 200, 50));
     Button button3 = new Button(new Rectangle(50, 150, 200, 50));
@@ -30,11 +34,14 @@ public static class Program
     processorUI.Add(button2);
     processorUI.Add(button3);
 
-    processorNavigation.RegisterDown(button1, button2);
-    processorNavigation.RegisterDown(button2, button3);
-    processorNavigation.RegisterDown(button3, button1);
+    processorNavigationUI.RegisterDown(button1, button2);
+    processorNavigationUI.RegisterDown(button2, button3);
+    processorNavigationUI.RegisterDown(button3, button1);
 
-    processorNavigation.SetSelected(button1);
+    processorNavigationUI.SetSelected(button1);
+
+    processorInputs.Add(processorMouse);
+    processorInputs.Add(processorNavigationRay);
 
     button1.Submited += () => OnClick($"Button 1 click!");
     button2.Submited += () => OnClick($"Button 2 click!");
@@ -45,7 +52,7 @@ public static class Program
       Raylib.BeginDrawing();
       Raylib.ClearBackground(Raylib.SKYBLUE);
 
-      processorNavigation.Update();
+      processorNavigationRay.Update();
       // processorMouse.Update();
       processorUI.Draw();
 
@@ -240,7 +247,7 @@ public static class Program
   public static UI.ElementInputState GetInputState(UI.Ray.Button button)
   {
     var stateMouse = processorMouse.Check(button, out var inputTypeMouse);
-    var stateNav = processorNavigation.Check(button, out var inputTypeNavigation);
+    var stateNav = processorNavigationRay.Check(button, out var inputTypeNavigation);
     var inputTypeButton = processorUI.Inputs[button];
 
     UI.ElementInputState result = UI.ElementInputState.Normal;
@@ -271,6 +278,9 @@ public static class Program
       processorUI.Inputs[button] = null;
       // button.InputType = InputType.None;
     }
+
+    if (result == UI.ElementInputState.Pressed)
+      processorNavigationUI.Selected = button;
 
     // if ((button.InputType == InputType.None || button.InputType == InputType.Navigation) && stateNav == UI.ElementInputState.Pressed)
     // {
